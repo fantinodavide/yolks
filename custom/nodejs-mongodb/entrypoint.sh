@@ -6,7 +6,7 @@ INTERNAL_IP=$(ip route get 1 | awk '{print $(NF-2);exit}')
 export INTERNAL_IP
 
 # Start MongoDB bound to 127.0.0.1
-mongod --bind_ip 127.0.0.1 &
+mongod --bind_ip 127.0.0.1 --port ${MONGODB_INTERNAL_PORT} --dbpath /home/container/mongodb_data &
 
 # Print Node.js Version
 node -v
