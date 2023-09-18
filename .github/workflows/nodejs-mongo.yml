@@ -1,0 +1,35 @@
+name: build nodejs-mongodb
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 1"
+  push:
+    branches:
+      - master
+    paths:
+      - nodejs/**
+      - mongodb/**
+
+jobs:
+  push:
+    name: "yolks:nodejs-mongodb"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+        with:
+          buildkitd-flags: --debug
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+      - uses: docker/build-push-action@v4
+        with:
+          context: ./nodejs-mongodb  # update to your context
+          file: ./nodejs-mongodb/Dockerfile  # update to your Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/parkervcp/yolks:nodejs-mongodb
