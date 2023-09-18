@@ -27,8 +27,8 @@ jobs:
           password: ${{ secrets.REGISTRY_TOKEN }}
       - uses: docker/build-push-action@v4
         with:
-          context: ./custom/nodejs-mongodb  # update to your context
-          file: ./custom/nodejs-mongodb/Dockerfile  # update to your Dockerfile
+          context: ./custom/nodejs-mongodb
+          file: ./custom/nodejs-mongodb/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
