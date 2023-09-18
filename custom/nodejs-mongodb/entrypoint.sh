@@ -5,6 +5,7 @@ cd /home/container
 INTERNAL_IP=$(ip route get 1 | awk '{print $(NF-2);exit}')
 export INTERNAL_IP
 
+[[ ! -e /home/container/mongodb_data ]] && mkdir /home/container/mongodb_data
 # Start MongoDB bound to 127.0.0.1
 mongod --bind_ip 127.0.0.1 --port ${MONGODB_INTERNAL_PORT} --dbpath /home/container/mongodb_data &
 
