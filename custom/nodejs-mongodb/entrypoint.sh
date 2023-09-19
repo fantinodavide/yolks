@@ -8,7 +8,7 @@ export INTERNAL_IP
 # MongoDB
 [[ ! -e /home/container/mongodb_data ]] && mkdir /home/container/mongodb_data
 [[ $MONGODB_QUIET -eq 1 ]] && QUIET_OUT="/dev/null" || QUIET_OUT="/dev/stdout"
-mongod --bind_ip 127.0.0.1 --port ${MONGODB_INTERNAL_PORT} --dbpath /home/container/mongodb_data --quiet &> $QUIET_OUT &
+mongod --bind_ip 127.0.0.1 --port ${SERVER_PORT} --dbpath /home/container/mongodb_data --quiet &> $QUIET_OUT &
 
 # Print Node.js Version
 node -v
