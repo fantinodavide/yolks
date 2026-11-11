@@ -7,25 +7,27 @@ on:
     branches:
       - master
     paths:
-      - nodejs/**
-      - mongodb/**
+      - custom/nodejs-mongodb/**
+      - .github/workflows/nodejs-mongo.yml
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   push:
     name: "yolks:nodejs-mongodb"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
-        with:
-          buildkitd-flags: --debug
-      - uses: docker/login-action@v2
+      - uses: actions/checkout@v7
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.REGISTRY_TOKEN }}
-      - uses: docker/build-push-action@v4
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v7
         with:
           context: ./custom/nodejs-mongodb
           file: ./custom/nodejs-mongodb/Dockerfile

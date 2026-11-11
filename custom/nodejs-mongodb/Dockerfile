@@ -1,31 +1,53 @@
-# Base image
-FROM --platform=$TARGETOS/$TARGETARCH node:20-bullseye-slim
+FROM --platform=$TARGETOS/$TARGETARCH mongo:5.0-focal
 
-# Environment setup
+LABEL org.opencontainers.image.source="https://github.com/fantinodavide/yolks" \
+      org.opencontainers.image.description="Node.js 20 and MongoDB 5.0 in one container for Pterodactyl and Pelican" \
+      org.opencontainers.image.licenses="MIT"
+
 ENV DEBIAN_FRONTEND=noninteractive
-ENV USER=container HOME=/home/container
 
-# Update package list
-RUN apt update -y
+RUN rm -f /etc/apt/sources.list.d/mongodb-org.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        ca-certificates \
+        curl \
+        dnsutils \
+        ffmpeg \
+        git \
+        gnupg \
+        iproute2 \
+        iputils-ping \
+        libnss3 \
+        libsqlite3-dev \
+        libtool \
+        netcat-openbsd \
+        python3 \
+        python3-dev \
+        sqlite3 \
+        tar \
+        tini \
+        tzdata \
+        zip \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
+        | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" \
+        > /etc/apt/sources.list.d/nodesource.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends nodejs \
+    && npm install --global typescript ts-node @types/node \
+    && npm cache clean --force \
+    && rm -rf /var/lib/apt/lists/* /tmp/* \
+    && useradd -d /home/container -m container -s /bin/bash
 
-# Install dependencies
-RUN apt install -y netcat iproute2 ffmpeg git sqlite3 libsqlite3-dev python3 python3-dev ca-certificates dnsutils tzdata zip tar curl build-essential libtool iputils-ping libnss3
+COPY --chown=container:container ./entrypoint.sh /entrypoint.sh
 
-# Install MongoDB
-RUN apt update -y && apt install -y gnupg wget \
-    && wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | apt-key add - \
-    && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-5.0.list \
-    && apt update -y \
-    && apt install -y mongodb-org
-
-# Create user and install Node.js packages
-RUN useradd -d /home/container -m container -s /bin/bash \
-    && npm install npm@latest typescript ts-node @types/node --location=global
-
-# Copy entrypoint
-COPY ./entrypoint.sh /entrypoint.sh
-
-# Workdir and CMD
-WORKDIR /home/container
 USER container
+ENV USER=container HOME=/home/container
+WORKDIR /home/container
+
+STOPSIGNAL SIGINT
+
+ENTRYPOINT ["/usr/bin/tini", "-g", "--"]
 CMD ["/bin/bash", "/entrypoint.sh"]
