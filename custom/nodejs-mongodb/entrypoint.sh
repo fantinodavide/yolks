@@ -41,7 +41,7 @@ fi
 export MONGODB_PORT
 export MONGODB_URI="mongodb://127.0.0.1:$MONGODB_PORT"
 
-[[ $MONGODB_QUIET -eq 1 ]] && MONGODB_OUTPUT=/dev/null || MONGODB_OUTPUT=/dev/stdout
+[[ ${MONGODB_QUIET,,} == @(1|true) ]] && MONGODB_OUTPUT=/dev/null || MONGODB_OUTPUT=/dev/stdout
 
 mkdir -p "$MONGODB_DATA"
 mongod --bind_ip 127.0.0.1 --port "$MONGODB_PORT" --dbpath "$MONGODB_DATA" --quiet &> "$MONGODB_OUTPUT" &

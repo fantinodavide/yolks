@@ -27,6 +27,6 @@ The startup script exports these variables to the app:
 | `MONGODB_PORT` | The port MongoDB listens on |
 | `MONGODB_URI` | `mongodb://127.0.0.1:<MONGODB_PORT>` |
 
-Set `MONGODB_QUIET=1` to hide MongoDB log output.
+Set `MONGODB_QUIET` to `1` or `true` to hide MongoDB log output.
 
 The image is rebuilt every Monday and on each change to `custom/nodejs-mongodb`.
