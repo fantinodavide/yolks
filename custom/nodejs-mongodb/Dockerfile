@@ -6,8 +6,10 @@ LABEL org.opencontainers.image.source="https://github.com/fantinodavide/yolks" \
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+COPY ./apt-update-with-retry.sh /usr/local/bin/apt-update-with-retry
+
 RUN rm -f /etc/apt/sources.list.d/mongodb-org.list \
-    && apt-get update \
+    && sh /usr/local/bin/apt-update-with-retry \
     && apt-get install -y --no-install-recommends \
         build-essential \
         ca-certificates \
@@ -34,11 +36,11 @@ RUN rm -f /etc/apt/sources.list.d/mongodb-org.list \
         | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" \
         > /etc/apt/sources.list.d/nodesource.list \
-    && apt-get update \
+    && sh /usr/local/bin/apt-update-with-retry \
     && apt-get install -y --no-install-recommends nodejs \
     && npm install --global typescript ts-node @types/node \
     && npm cache clean --force \
-    && rm -rf /var/lib/apt/lists/* /tmp/* \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /usr/local/bin/apt-update-with-retry \
     && useradd -d /home/container -m container -s /bin/bash
 
 COPY --chown=container:container ./entrypoint.sh /entrypoint.sh
